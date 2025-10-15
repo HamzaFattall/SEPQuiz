@@ -259,6 +259,51 @@
       margin: 0 auto;
     }
     
+    .wrong-answers {
+      text-align: left;
+      margin: 30px 0;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .wrong-answer-item {
+      background: rgba(255, 50, 50, 0.1);
+      border-left: 4px solid #ff3232;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    
+    .wrong-answer-header {
+      font-weight: bold;
+      color: #ff3232;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    
+    .wrong-answer-question {
+      margin-bottom: 15px;
+      font-size: 1rem;
+      color: #f0f0f0;
+    }
+    
+    .wrong-answer-detail {
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 4px;
+    }
+    
+    .your-answer {
+      background: rgba(255, 50, 50, 0.2);
+      color: #ff6666;
+    }
+    
+    .correct-answer {
+      background: rgba(0, 255, 204, 0.2);
+      color: #00ffcc;
+    }
+    
     .category-tabs {
       display: flex;
       margin-bottom: 20px;
@@ -363,6 +408,7 @@
           <h2 class="result-title">Quiz Completed!</h2>
           <div class="score" id="score">0/150</div>
           <div class="score-text" id="score-text"></div>
+          <div id="wrong-answers" class="wrong-answers"></div>
           <button class="restart-btn" id="restart-btn">Restart Quiz</button>
         </div>
       </div>
@@ -641,9 +687,18 @@
     // Calculate and show results
     function showResults() {
       score = 0;
+      const wrongAnswers = [];
+      
       for (let i = 0; i < quizData.length; i++) {
         if (userAnswers[i] === quizData[i].answer) {
           score++;
+        } else {
+          wrongAnswers.push({
+            questionNum: i + 1,
+            question: quizData[i],
+            userAnswer: userAnswers[i],
+            correctAnswer: quizData[i].answer
+          });
         }
       }
       
@@ -660,6 +715,57 @@
         scoreText.textContent = 'You passed, but there\'s room for improvement. Review the material.';
       } else {
         scoreText.textContent = 'Keep studying! Review the course material and try again.';
+      }
+      
+      // Display wrong answers
+      const wrongAnswersContainer = document.getElementById('wrong-answers');
+      wrongAnswersContainer.innerHTML = '';
+      
+      if (wrongAnswers.length > 0) {
+        const header = document.createElement('h3');
+        header.style.color = '#ff3232';
+        header.style.marginBottom = '20px';
+        header.textContent = `Questions to Review (${wrongAnswers.length} incorrect)`;
+        wrongAnswersContainer.appendChild(header);
+        
+        wrongAnswers.forEach(item => {
+          const wrongItem = document.createElement('div');
+          wrongItem.className = 'wrong-answer-item';
+          
+          const questionHeader = document.createElement('div');
+          questionHeader.className = 'wrong-answer-header';
+          questionHeader.textContent = `Question ${item.questionNum}`;
+          
+          const questionText = document.createElement('div');
+          questionText.className = 'wrong-answer-question';
+          questionText.textContent = item.question.q;
+          
+          const yourAnswerDiv = document.createElement('div');
+          yourAnswerDiv.className = 'wrong-answer-detail your-answer';
+          if (item.userAnswer !== null) {
+            yourAnswerDiv.innerHTML = `<strong>Your Answer:</strong> ${item.question.options[item.userAnswer]}`;
+          } else {
+            yourAnswerDiv.innerHTML = `<strong>Your Answer:</strong> (No answer selected)`;
+          }
+          
+          const correctAnswerDiv = document.createElement('div');
+          correctAnswerDiv.className = 'wrong-answer-detail correct-answer';
+          correctAnswerDiv.innerHTML = `<strong>Correct Answer:</strong> ${item.question.options[item.correctAnswer]}`;
+          
+          wrongItem.appendChild(questionHeader);
+          wrongItem.appendChild(questionText);
+          wrongItem.appendChild(yourAnswerDiv);
+          wrongItem.appendChild(correctAnswerDiv);
+          
+          wrongAnswersContainer.appendChild(wrongItem);
+        });
+      } else {
+        const perfectScore = document.createElement('div');
+        perfectScore.style.color = '#00ffcc';
+        perfectScore.style.fontSize = '1.2rem';
+        perfectScore.style.marginTop = '20px';
+        perfectScore.textContent = '🎉 Perfect score! You got all questions correct!';
+        wrongAnswersContainer.appendChild(perfectScore);
       }
       
       questionSection.style.display = 'none';
