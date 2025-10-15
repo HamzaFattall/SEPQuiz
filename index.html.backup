@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DACS4101 - Security Engineering Principles Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0e0e0e, #1a1a2e);
+      color: #f0f0f0;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: rgba(28, 28, 44, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+    
+    header {
+      background: linear-gradient(90deg, #00ffcc, #00cca3);
+      color: #000;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    
+    .quiz-info {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 25px;
+      background: #222233;
+      border-bottom: 1px solid #333344;
+    }
+    
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .info-label {
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    
+    .info-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #00ffcc;
+    }
+    
+    .quiz-container {
+      display: flex;
+      min-height: 500px;
+    }
+    
+    .sidebar {
+      width: 330px;
+      min-width: 330px;
+      background: #1a1a2e;
+      padding: 20px;
+      border-right: 1px solid #333344;
+      overflow-y: auto;
+    }
+    
+    .question-nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .question-nav-btn {
+      width: 100%;
+      height: 40px;
+      background: #222233;
+      border: 1px solid #333344;
+      color: #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    
+    .question-nav-btn:hover {
+      background: #333344;
+    }
+    
+    .question-nav-btn.active {
+      background: #00ffcc;
+      color: #000;
+      border-color: #00cca3;
+    }
+    
+    .question-nav-btn.answered {
+      background: #0066cc;
+      color: #fff;
+    }
+    
+    .main-content {
+      flex: 1;
+      padding: 30px 35px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      min-width: 0;
+    }
+    
+    .question-section {
+      flex: 1;
+    }
+    
+    .question-number {
+      font-size: 1.2rem;
+      color: #00ffcc;
+      margin-bottom: 15px;
+    }
+    
+    .question-text {
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+    
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+    
+    .option {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: #222233;
+      border: 1px solid #333344;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .option:hover {
+      background: #2a2a3a;
+    }
+    
+    .option.selected {
+      background: #0066cc;
+      border-color: #00aaff;
+    }
+    
+    .option input {
+      margin-right: 12px;
+    }
+    
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    button {
+      background: #00ffcc;
+      color: #000;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      background: #00cca3;
+      transform: translateY(-2px);
+    }
+    
+    button:disabled {
+      background: #555;
+      color: #999;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .submit-section {
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid #333344;
+    }
+    
+    #submit-btn {
+      background: #ff3366;
+      color: white;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+    }
+    
+    #submit-btn:hover {
+      background: #e62e5c;
+    }
+    
+    .result-section {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .result-title {
+      font-size: 2rem;
+      color: #00ffcc;
+      margin-bottom: 20px;
+    }
+    
+    .score {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #00ffcc;
+      margin: 20px 0;
+    }
+    
+    .score-text {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+    
+    .restart-btn {
+      background: #00ffcc;
+      color: #000;
+      margin: 0 auto;
+    }
+    
+    .category-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #333344;
+    }
+    
+    .category-tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .category-tab.active {
+      border-bottom: 3px solid #00ffcc;
+      color: #00ffcc;
+    }
+    
+    @media (max-width: 768px) {
+      .quiz-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #333344;
+      }
+      
+      .question-nav {
+        grid-template-columns: repeat(10, 1fr);
+      }
+      
+      .question-nav-btn {
+        height: 30px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>DACS4101 - Security Engineering Principles</h1>
+      <div class="subtitle">Comprehensive Quiz - 150 Questions</div>
+    </header>
+    
+    <div class="quiz-info">
+      <div class="info-item">
+        <span class="info-label">Questions</span>
+        <span class="info-value">150</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Time</span>
+        <span class="info-value">Unlimited</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Category</span>
+        <span class="info-value">Security Engineering</span>
+      </div>
+    </div>
+    
+    <div class="category-tabs">
+      <div class="category-tab active" data-category="all">All Questions</div>
+      <div class="category-tab" data-category="1">Risk Management (1-30)</div>
+      <div class="category-tab" data-category="2">Risk Control & Economics (31-60)</div>
+      <div class="category-tab" data-category="3">Security Architecture (61-90)</div>
+      <div class="category-tab" data-category="4">Segmentation & Access Control (91-150)</div>
+    </div>
+    
+    <div class="quiz-container">
+      <div class="sidebar">
+        <h3>Question Navigation</h3>
+        <div class="question-nav" id="question-nav">
+          <!-- Question navigation buttons will be generated here -->
+        </div>
+      </div>
+      
+      <div class="main-content">
+        <div class="question-section" id="question-section">
+          <div class="question-number">Question <span id="current-q">1</span> of 150</div>
+          <div class="question-text" id="question-text"></div>
+          
+          <div class="options-container" id="options-container">
+            <!-- Options will be generated here -->
+          </div>
+          
+          <div class="navigation">
+            <button id="prev-btn" disabled>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Previous
+            </button>
+            <button id="next-btn">
+              Next
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="submit-section">
+          <button id="submit-btn">Submit Quiz</button>
+        </div>
+        
+        <div class="result-section" id="result-section">
+          <h2 class="result-title">Quiz Completed!</h2>
+          <div class="score" id="score">0/150</div>
+          <div class="score-text" id="score-text"></div>
+          <button class="restart-btn" id="restart-btn">Restart Quiz</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Quiz data with all 150 questions
+    const quizData = [
+      // CHAPTER 1: RISK MANAGEMENT (Questions 1-25)
+      {q: 'What is the core definition of risk in security engineering?', options: ['A weakness that can be exploited.', 'The potential for loss or damage when a threat exploits a vulnerability.', 'Any potential source of harm.', 'The financial impact of a security incident.'], answer: 1},
+      {q: 'In the risk triad, a hacker is an example of a:', options: ['Vulnerability', 'Threat', 'Impact', 'Asset'], answer: 1},
+      {q: 'An unpatched web server is an example of a:', options: ['Threat', 'Vulnerability', 'Risk', 'Control'], answer: 1},
+      {q: 'A qualitative risk assessment methodology that uses a panel of experts to reach a consensus through multiple rounds of surveys is called:', options: ['Monte Carlo Simulation', 'The Delphi Method', 'STRIDE Model', 'CVSS Scoring'], answer: 1},
+      {q: 'A risk matrix (or heat map) visualizes risk by categorizing it based on which two dimensions?', options: ['Probability and Severity', 'Likelihood and Impact', 'Threat and Vulnerability', 'Cost and Benefit'], answer: 1},
+      {q: 'Which quantitative risk assessment method uses random sampling and modeling to estimate the probability distribution of outcomes?', options: ['Bayesian Networks', 'DREAD Model', 'Monte Carlo Simulation', 'Attack Trees'], answer: 2},
+      {q: 'Bayesian Networks are graphical models used for cyber threat assessment that represent what?', options: ['The financial impact of risks', 'The steps an attacker takes', 'Probabilistic relationships among threats, vulnerabilities, and outcomes', 'The network topology of an organization'], answer: 2},
+      {q: 'The selection of a risk assessment methodology (Qualitative, Quantitative, Hybrid) depends on all of the following EXCEPT:', options: ['The organization\'s goals', 'The color of the company\'s logo', 'Available data and resources', 'The level of precision required'], answer: 1},
+      {q: 'Threat Analysis is defined as:', options: ['The process of buying insurance to transfer risk.', 'A systematic process of identifying and assessing potential threats to an organization\'s assets.', 'The implementation of firewalls and encryption.', 'The calculation of a single risk score for the entire organization.'], answer: 1},
+      {q: 'Which of the following is NOT a typical component of Threat Analysis?', options: ['Identifying Potential Threat Actors', 'Assessing Threat Capabilities', 'Setting the company\'s stock price', 'Analyzing Attack Vectors'], answer: 2},
+      {q: 'The STRIDE model, developed by Microsoft, is used for what purpose?', options: ['Quantitative financial risk calculation', 'Threat Modeling', 'Business continuity planning', 'Insurance policy evaluation'], answer: 1},
+      {q: 'Which of the following is a category in the STRIDE model?', options: ['Discoverability', 'Reproducibility', 'Repudiation', 'Affected Users'], answer: 2},
+      {q: 'The DREAD model is used for what primary purpose?', options: ['Identifying threat actors', 'Evaluating the severity of a threat', 'Calculating annual loss expectancy', 'Designing network segmentation'], answer: 1},
+      {q: 'In the DREAD model, the \'A\' stands for:', options: ['Attack Vector', 'Affected Users', 'Asset Value', 'Authentication Bypass'], answer: 1},
+      {q: 'An assessment technique that focuses on identifying and assessing threats specific to an organization\'s critical assets is called:', options: ['Red Team Assessment', 'Asset-Based Threat Assessment', 'Threat Hunting', 'CVSS Assessment'], answer: 1},
+      {q: 'Which technique involves a proactive search for potential threats or indicators of compromise, often emphasizing AI?', options: ['Red Team Assessment', 'Threat Hunting', 'Penetration Testing', 'Vulnerability Scanning'], answer: 1},
+      {q: 'What is the purpose of a Red Team Assessment?', options: ['To manage user identities', 'To simulate real-world attacks and assess security posture', 'To perform automated code analysis', 'To write security policies'], answer: 1},
+      {q: 'The Common Vulnerability Scoring System (CVSS) is designed to:', options: ['Manage user access rights.', 'Provide a standardized score for vulnerability severity.', 'Automate the threat modeling process.', 'Implement mandatory access control.'], answer: 1},
+      {q: 'Which CVSS metric group represents characteristics of a vulnerability that are constant over time?', options: ['Temporal Metric Group', 'Environmental Metric Group', 'Base Metric Group', 'Exploitability Metric Group'], answer: 2},
+      {q: 'According to the CVSS v3.1 ratings, a score of 8.5 would be classified as:', options: ['Low', 'Medium', 'High', 'Critical'], answer: 2},
+      {q: 'What is the primary difference between qualitative and quantitative risk assessment?', options: ['Qualitative uses numbers, quantitative uses descriptions', 'Quantitative is always more accurate than qualitative', 'Qualitative uses subjective scales, quantitative uses numerical values', 'Qualitative is for small companies, quantitative for large companies'], answer: 2},
+      {q: 'In the risk matrix, what would a risk with "Almost Certain" likelihood and "Catastrophic" impact be classified as?', options: ['Low Risk', 'Moderate Risk', 'High Risk', 'Extreme Risk'], answer: 3},
+      {q: 'The Delphi Method relies on input from:', options: ['A single security expert', 'All employees in the organization', 'A panel of experts', 'Customers and clients'], answer: 2},
+      {q: 'Which threat analysis technique uses six categories: Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege?', options: ['DREAD', 'STRIDE', 'PASTA', 'OCTAVE'], answer: 1},
+      {q: 'In the DREAD model, if Damage=9, Reproducibility=7, Exploitability=8, Affected Users=6, Discoverability=5, what is the overall risk score?', options: ['6', '7', '8', '35'], answer: 1},
+      {q: 'What is the main purpose of Asset-Based Threat Assessment?', options: ['To identify threats specific to critical assets', 'To calculate insurance premiums', 'To automate security testing', 'To manage user identities'], answer: 0},
+      {q: 'Threat Hunting differs from traditional monitoring because it is:', options: ['Reactive', 'Automated only', 'Proactive', 'Required by law'], answer: 2},
+      {q: 'The CVSS Base Metric Group does NOT include which of the following?', options: ['Attack Vector', 'Remediation Level', 'Privileges Required', 'User Interaction'], answer: 1},
+      {q: 'A CVSS score of 5.5 would be rated as:', options: ['Low', 'Medium', 'High', 'Critical'], answer: 1},
+      {q: 'The FIRST organization is responsible for maintaining which standard?', options: ['ISO 27001', 'NIST Framework', 'CVSS', 'PCI DSS'], answer: 2},
+      
+      // Part 2: Risk Control, Strategy, and Economics (Questions 31-60)
+      {q: 'Risk Control refers to the systematic approach to:', options: ['Eliminating all business risks regardless of cost.', 'Identifying, assessing, and reducing risks associated with potential loss or harm.', 'Outsourcing all security functions to a third party.', 'Purchasing insurance for every identified risk.'], answer: 1},
+      {q: 'Which of the following is a crucial tool in risk management that lists potential risks, their severity, and mitigation actions?', options: ['Risk Register', 'Firewall Rule Set', 'Incident Response Plan', 'Business Impact Analysis'], answer: 0},
+      {q: 'In a well-structured risk management system, who should typically be the "owner" of a risk?', options: ['The IT Support Technician', 'A Senior Executive', 'The External Auditor', 'The Security Guard'], answer: 1},
+      {q: 'Standards like ISO 27001 are often driven by the requirements of:', options: ['Marketing Departments', 'Auditors', 'Shareholders', 'Software Vendors'], answer: 1},
+      {q: 'According to the lecture, what is often considered the "biggest cyber threat" to organizations?', options: ['Outdated Software', 'Employees (Insiders)', 'Weak Passwords', 'Fast-Growing Attack Tools'], answer: 1},
+      {q: 'Which of the following is a potential trace left by a malicious insider?', options: ['Regularly updating software', 'Accessing sensitive data not associated with their job', 'Attending all security training sessions', 'Using only company-approved storage devices'], answer: 1},
+      {q: 'If a firm has a turnover of $10m and theft losses of $150,000, but could double its turnover, the lesson in "Balancing Risk and Reward" is that:', options: ['All theft must be eliminated at any cost.', 'Shareholders might accept the risk if the potential reward is great enough.', 'Security personnel should always have the final say.', 'Gross profit is the only metric that matters.'], answer: 1},
+      {q: 'The risk control strategy that involves eliminating any activities that can lead to exposure to risk is:', options: ['Risk Reduction', 'Risk Sharing', 'Risk Acceptance', 'Risk Avoidance'], answer: 3},
+      {q: 'Installing a fire suppression system to decrease potential damage is an example of:', options: ['Risk Avoidance', 'Risk Reduction', 'Risk Sharing', 'Risk Acceptance'], answer: 1},
+      {q: 'Purchasing insurance to protect against financial loss from a lawsuit is an example of:', options: ['Risk Avoidance', 'Risk Reduction', 'Risk Sharing', 'Risk Acceptance'], answer: 2},
+      {q: 'Deciding to do nothing about a risk because the cost of mitigation outweighs the potential loss is called:', options: ['Risk Avoidance', 'Risk Reduction', 'Risk Sharing', 'Risk Acceptance'], answer: 3},
+      {q: 'For a server room in a flood-prone basement, relocating the servers to a higher floor is an example of:', options: ['Risk Avoidance', 'Risk Reduction', 'Risk Sharing', 'Risk Acceptance'], answer: 0},
+      {q: 'The step-by-step risk management process begins with:', options: ['Implementing Security Controls', 'Understanding the Business Context', 'Identifying Assets', 'Developing Security Policies'], answer: 1},
+      {q: 'Compliant controls are measures that:', options: ['Are always the most convenient for users.', 'Mitigate risks and comply with standards, regulations, and policies.', 'Are implemented without any prior planning.', 'Focus solely on technical aspects, ignoring policies.'], answer: 1},
+      {q: 'The "Security vs. Convenience" dilemma illustrates that if a two-factor authentication system is too cumbersome, employees might:', options: ['Become more security-aware.', 'Write down their passwords, creating a new vulnerability.', 'Report the issue to management immediately.', 'Automatically get a security exemption.'], answer: 1},
+      {q: 'The economics of security often fail due to:', options: ['A lack of available security technology.', 'Misaligned incentives where those guarding a system don\'t bear the costs of failure.', 'Governments regulating the security industry too heavily.', 'Security products being too expensive.'], answer: 1},
+      {q: 'The practice of using mechanisms like insurance or contracts to transfer risk to another party, potentially leading to underinvestment in security, is known as:', options: ['Risk Acceptance', 'Risk Hedging', 'Risk Dumping', 'Risk Analysis'], answer: 2},
+      {q: 'Why were early versions of the Windows OS historically considered insecure?', options: ['They were built on open-source code.', 'They prioritized ease of use and compatibility over security.', 'They used a microkernel architecture.', 'Microsoft had too many competitors.'], answer: 1},
+      {q: 'Game theory studies:', options: ['The development of video games.', 'Strategic interactions where the outcome for each player depends on the actions of all.', 'The economic theory of auction houses.', 'Probability and statistics in isolation.'], answer: 1},
+      {q: 'In the Prisoner\'s Dilemma, the dominant strategy that leads to a worse collective outcome is for each prisoner to:', options: ['Remain Silent', 'Confess', 'Escape from prison', 'Accuse the judge'], answer: 1},
+      {q: 'A Vickrey auction is a type of:', options: ['English Auction', 'Dutch Auction', 'First-Price Sealed-Bid Auction', 'Second-Price Sealed-Bid Auction'], answer: 3},
+      {q: 'The concept that different types of auctions can lead to the same strategic outcomes is called:', options: ['Nash Equilibrium', 'Strategic Equivalence', 'Payoff Maximization', 'Dominant Strategy'], answer: 1},
+      {q: 'What is a "Risk Register"?', options: ['A list of insurance policies', 'A document listing potential risks, their severity, and mitigation actions', 'A record of security incidents', 'A database of user access rights'], answer: 1},
+      {q: 'In risk management, "Risk Ownership" typically falls to:', options: ['IT support staff', 'Junior employees', 'Senior executives', 'External consultants'], answer: 2},
+      {q: 'Which compliance regime is specifically mentioned as an international security management standard?', options: ['NIST SP 800-53', 'ISO 27001', 'HIPAA', 'GDPR'], answer: 1},
+      {q: 'Which of the following is NOT typically a sign of a potential malicious insider?', options: ['Working regular hours', 'Downloading significant amounts of data', 'Accessing data not related to their job', 'Using unauthorized storage devices'], answer: 0},
+      {q: 'If a company implements strict security controls that significantly reduce productivity, they have failed to properly:', options: ['Manage risk', 'Balance risk and reward', 'Purchase insurance', 'Train employees'], answer: 1},
+      {q: 'The risk control strategy of "doing nothing because the cost of action exceeds potential loss" is called:', options: ['Risk Avoidance', 'Risk Reduction', 'Risk Sharing', 'Risk Acceptance'], answer: 3},
+      {q: 'What is the first step in the risk management process according to the material?', options: ['Implement security controls', 'Understand the business context', 'Identify assets', 'Perform risk assessment'], answer: 1},
+      {q: 'The problem that occurs when security controls are so restrictive that users find workarounds is known as the:', options: ['Compliance dilemma', 'Security vs. convenience tradeoff', 'Risk acceptance paradox', 'Control effectiveness gap'], answer: 1},
+      
+      // Part 3: Security Architecture & Policy Models (Questions 61-90)
+      {q: 'The three key steps in the Process of Security Engineering are:', options: ['Plan, Do, Check, Act', 'Threat Model, Security Policy, Security Mechanisms', 'Identify, Protect, Detect, Respond', 'Prevention, Detection, Response'], answer: 1},
+      {q: 'A "Security Policy Model" is best described as:', options: ['A long list of vague security suggestions.', 'A succinct statement of the protection properties a system must have.', 'The configuration settings for a firewall.', 'The contract with a security vendor.'], answer: 1},
+      {q: 'The first system to implement a multi-level security policy was:', options: ['UNIX', 'ADEPT-50 / IBM S/360', 'Windows NT', 'The ARPANET'], answer: 1},
+      {q: 'Multi-Level Security (MLS) is primarily used to:', options: ['Increase processor speed.', 'Prevent data leakage between different classification levels.', 'Simplify user management.', 'Reduce software costs.'], answer: 1},
+      {q: 'The Anderson Report in the 1960s was significant because it:', options: ['Invented the first computer virus.', 'Studied the challenges of managing classified information in computer systems.', 'Created the TCP/IP protocol.', 'Recommended the disbanding of the NSA.'], answer: 1},
+      {q: 'The Bell-LaPadula (BLP) model is primarily concerned with protecting what?', options: ['Data Integrity', 'Data Confidentiality', 'System Availability', 'User Privacy'], answer: 1},
+      {q: 'The "Simple Security Property" (no read up) in the BLP model states that:', options: ['A subject cannot read an object at a higher classification level.', 'A subject cannot write to an object at a lower classification level.', 'A subject cannot read an object at a lower classification level.', 'A subject cannot write to an object at a higher classification level.'], answer: 0},
+      {q: 'The "Star Property" (no write down) in the BLP model states that:', options: ['A subject cannot read an object at a higher classification level.', 'A subject cannot write to an object at a lower classification level.', 'A subject cannot read an object at a lower classification level.', 'A subject cannot write to an object at a higher classification level.'], answer: 1},
+      {q: 'A key criticism of the Bell-LaPadula model was its:', options: ['Overemphasis on data integrity.', 'Overemphasis on data confidentiality, neglecting integrity.', 'Inability to handle any form of access control.', 'Complexity in managing user roles.'], answer: 1},
+      {q: 'The Biba model was the first formal model focused on what?', options: ['Data Confidentiality', 'Data Integrity', 'User Accountability', 'System Design'], answer: 1},
+      {q: 'In the Biba model, the "No Write Up" policy is designed to:', options: ['Prevent untrusted data from contaminating trusted sources.', 'Prevent users from reading secret documents.', 'Allow free flow of information between security levels.', 'Implement discretionary access control.'], answer: 0},
+      {q: 'Starting from Windows Vista, Microsoft implemented a form of MAC integrity levels based on which model?', options: ['Bell-LaPadula Model', 'Clark-Wilson Model', 'Biba Model', 'Chinese Wall Model'], answer: 2},
+      {q: 'A mechanism that was not designed for communication but can be abused to leak information from a high to a low classification level is called a:', options: ['Overt Channel', 'Covert Channel', 'Encrypted Tunnel', 'Polyinstantiation'], answer: 1},
+      {q: 'The problem that arises in MLS when a low-level user tries to create an object with the same name as a high-level object is called:', options: ['The Cascade Problem', 'Covert Channel', 'Polyinstantiation', 'Aggregation'], answer: 2},
+      {q: 'The "Aggregation Problem" refers to:', options: ['Combining multiple security systems', 'Individual unclassified data revealing secrets when combined', 'Adding up security costs', 'Grouping users by department'], answer: 1},
+      {q: 'Multilateral security is particularly challenging because:', options: ['It only works in military environments', 'It requires separating people with the same clearance level', 'It eliminates all need for authentication', 'It\'s cheaper to implement than MLS'], answer: 1},
+      {q: 'The Clark-Wilson model is designed primarily for what type of environments?', options: ['Military classified systems', 'Commercial and business systems', 'Academic research', 'Personal home use'], answer: 1},
+      {q: 'In the Clark-Wilson model, critical data that can only be manipulated by authorized procedures is called:', options: ['Unconstrained Data Items (UDIs)', 'Transformation Procedures (TPs)', 'Constrained Data Items (CDIs)', 'Integrity Verification Procedures (IVPs)'], answer: 2},
+      {q: 'A core principle of the Clark-Wilson model that divides responsibilities among multiple users to reduce fraud is:', options: ['Well-Formed Transactions', 'Separation of Duties', 'Access Control Triples', 'Auditing and Logging'], answer: 1},
+      {q: 'The three-step security engineering process includes all EXCEPT:', options: ['Threat Model', 'Security Policy', 'Budget Approval', 'Security Mechanisms'], answer: 2},
+      {q: 'A proper security policy model should be:', options: ['Vague to allow flexibility', 'Long and detailed', 'Succinct and explicit about protection properties', 'Written only in technical language'], answer: 2},
+      {q: 'The first computer system to implement multi-level security was developed for:', options: ['University research', 'IBM S/360 mainframe', 'Personal computers', 'Mobile devices'], answer: 1},
+      {q: 'The primary goal of Multi-Level Security (MLS) is to prevent:', options: ['Data modification', 'Data leakage between classification levels', 'Denial of service attacks', 'User authentication issues'], answer: 1},
+      {q: 'The Anderson Report was significant because it:', options: ['Created the first computer virus', 'Studied classified information challenges in computer systems', 'Invented the internet', 'Established Microsoft as a security leader'], answer: 1},
+      {q: 'The Bell-LaPadula "No Read Up" property is formally called:', options: ['Star Property', 'Simple Security Property', 'Strong Star Property', 'Tranquility Property'], answer: 1},
+      {q: 'The Bell-LaPadula "No Write Down" property is formally called:', options: ['Simple Security Property', 'Star Property', 'Integrity Property', 'Confidentiality Property'], answer: 1},
+      {q: 'System Z controversy involved:', options: ['Modifying BLP properties to allow some information flow downward', 'Creating a new operating system', 'Eliminating all access controls', 'Focusing only on integrity'], answer: 0},
+      {q: 'The Biba model focuses primarily on:', options: ['Confidentiality', 'Integrity', 'Availability', 'Authentication'], answer: 1},
+      {q: 'Windows Vista implemented integrity levels based on which model?', options: ['Bell-LaPadula', 'Biba', 'Clark-Wilson', 'Chinese Wall'], answer: 1},
+      {q: 'A "covert channel" could potentially use which shared resource to leak information?', options: ['CPU clock frequency', 'Network bandwidth', 'Disk space', 'Monitor resolution'], answer: 0},
+      
+      // Part 4: Segmentation & Access Control (Questions 91-150)
+      {q: 'The division of data or processes into separate segments, each with its own permissions, is known as:', options: ['Virtualization', 'Segmentation', 'Encryption', 'Redundancy'], answer: 1},
+      {q: 'The concept of segment addressing for security can be traced back to:', options: ['Early IBM Mainframes', 'The first personal computers', 'Smartphones', 'Cloud computing platforms'], answer: 0},
+      {q: 'Dividing a network into smaller, isolated subnets using VLANs is an example of:', options: ['Memory Segmentation', 'Network Segmentation', 'Database Segmentation', 'User Segmentation'], answer: 1},
+      {q: 'Row-Level Security (RLS) and Transparent Data Encryption (TDE) are techniques associated with:', options: ['Network Segmentation', 'Database Segmentation', 'Application Segmentation', 'Geographical Segmentation'], answer: 1},
+      {q: 'Isolating application components using microservices and containers is an example of:', options: ['Network Segmentation', 'Database Segmentation', 'Application Segmentation', 'User Segmentation'], answer: 2},
+      {q: 'Categorizing users based on roles and responsibilities to enforce access controls is the basis of:', options: ['Geographical Segmentation', 'User Segmentation', 'Memory Segmentation', 'Network Segmentation'], answer: 1},
+      {q: 'Separating systems and data based on physical location to meet regulatory requirements is called:', options: ['User Segmentation', 'Application Segmentation', 'Geographical Segmentation', 'Database Segmentation'], answer: 2},
+      {q: 'Which segmentation type\'s mitigation includes "Privilege Rings, MMU, Paging"?', options: ['Network', 'Database', 'Memory', 'Application'], answer: 2},
+      {q: 'The security technique that regulates who or what can view, use, or access resources is called:', options: ['Threat Analysis', 'Risk Management', 'Access Control', 'Segmentation'], answer: 2},
+      {q: 'The process of recognizing an entity in a system is called:', options: ['Authentication', 'Authorization', 'Identification', 'Accountability'], answer: 2},
+      {q: 'Verifying the identity of a user is the process of:', options: ['Identification', 'Authentication', 'Authorization', 'Accountability'], answer: 1},
+      {q: 'Determining if a user has the right to access a resource is the process of:', options: ['Identification', 'Authentication', 'Authorization', 'Accountability'], answer: 2},
+      {q: 'In which access control model does the data owner decide who has access?', options: ['Mandatory Access Control (MAC)', 'Role-Based Access Control (RBAC)', 'Discretionary Access Control (DAC)', 'Attribute-Based Access Control (ABAC)'], answer: 2},
+      {q: 'In which access control model are access decisions enforced by a central authority based on security labels?', options: ['Mandatory Access Control (MAC)', 'Role-Based Access Control (RBAC)', 'Discretionary Access Control (DAC)', 'Attribute-Based Access Control (ABAC)'], answer: 0},
+      {q: 'In which access control model are permissions assigned to roles, which are then assigned to users?', options: ['Mandatory Access Control (MAC)', 'Role-Based Access Control (RBAC)', 'Discretionary Access Control (DAC)', 'Rule-Based Access Control (RBAC)'], answer: 1},
+      {q: 'Which access control model uses policies that evaluate user attributes, resource attributes, and environmental conditions?', options: ['Mandatory Access Control (MAC)', 'Role-Based Access Control (RBAC)', 'Discretionary Access Control (DAC)', 'Attribute-Based Access Control (ABAC)'], answer: 3},
+      {q: 'The Chinese Wall Model is specifically designed to prevent what?', options: ['SQL Injection attacks', 'Conflicts of Interest', 'Denial of Service attacks', 'Data loss from hardware failure'], answer: 1},
+      {q: 'A centralized platform that manages digital identities and controls user access to resources is known as a(n):', options: ['Intrusion Detection System (IDS)', 'Identity and Access Management (IAM) System', 'Security Information and Event Management (SIEM) system', 'Data Loss Prevention (DLP) system'], answer: 1},
+      {q: 'Which Microsoft service is the core on-premises directory service for Windows domains?', options: ['Azure Active Directory', 'Active Directory Domain Services (AD DS)', 'Active Directory Federation Services (AD FS)', 'Active Directory Certificate Services (AD CS)'], answer: 1},
+      {q: 'Which service provides Single Sign-On (SSO) across different organizations or systems?', options: ['Active Directory Domain Services (AD DS)', 'Active Directory Federation Services (AD FS)', 'Active Directory Lightweight Directory Services (AD LDS)', 'Active Directory Rights Management Services (AD RMS)'], answer: 1},
+      {q: 'Measures to secure buildings and assets against unauthorized physical access are known as:', options: ['Logical Access Control', 'Physical Access Control', 'Network Access Control', 'Administrative Controls'], answer: 1},
+      {q: 'A concrete wall is an example of what type of physical access control?', options: ['Soft Method', 'Hard Method', 'Entry Control', 'Operational Control'], answer: 1},
+      {q: 'Strategic landscaping is an example of what type of physical access control?', options: ['Soft Method', 'Hard Method', 'Entry Control', 'Operational Control'], answer: 0},
+      {q: 'Biometric scanners and card access systems are examples of:', options: ['Soft Methods', 'Hard Methods', 'Entry Controls', 'Operational Controls'], answer: 2},
+      {q: 'Security policies and CCTV monitoring are examples of:', options: ['Soft Methods', 'Hard Methods', 'Entry Controls', 'Operational Controls'], answer: 3},
+      {q: 'A major challenge of traditional locks and keys in a large organization is:', options: ['Their reliance on electricity.', 'The difficulty and cost of key management and rekeying.', 'Their incompatibility with metal doors.', 'Their high false acceptance rate.'], answer: 1},
+      {q: 'The historical roots of segmentation can be traced to early:', options: ['Personal computers', 'IBM mainframes', 'Mobile phones', 'Internet routers'], answer: 1},
+      {q: 'Dividing a network using VLANs is an example of:', options: ['Memory segmentation', 'Network segmentation', 'Database segmentation', 'Application segmentation'], answer: 1},
+      {q: 'Row-Level Security (RLS) is a technique used in:', options: ['Network segmentation', 'Database segmentation', 'Application segmentation', 'User segmentation'], answer: 1},
+      {q: 'Using Docker containers and microservices is an example of:', options: ['Network segmentation', 'Database segmentation', 'Application segmentation', 'Geographical segmentation'], answer: 2},
+      {q: 'RBAC (Role-Based Access Control) is used for:', options: ['Network segmentation', 'User segmentation', 'Geographical segmentation', 'Memory segmentation'], answer: 1},
+      {q: 'Storing data in specific countries to comply with laws is an example of:', options: ['Network segmentation', 'Database segmentation', 'Geographical segmentation', 'Application segmentation'], answer: 2},
+      {q: 'The access control process flow is:', options: ['Authorization → Authentication → Identification', 'Identification → Authentication → Authorization', 'Authentication → Identification → Authorization', 'Identification → Authorization → Authentication'], answer: 1},
+      {q: 'In DAC (Discretionary Access Control), who decides access permissions?', options: ['System administrator', 'Data owner', 'Security manager', 'Government regulator'], answer: 1},
+      {q: 'In MAC (Mandatory Access Control), access decisions are based on:', options: ['User preferences', 'Central policy and security labels', 'Department budgets', 'Time of day'], answer: 1},
+      {q: 'RBAC assigns permissions to:', options: ['Individual users', 'Roles', 'Departments', 'Security levels'], answer: 1},
+      {q: 'ABAC (Attribute-Based Access Control) uses which factors for access decisions?', options: ['User roles only', 'User attributes, resource attributes, and environmental conditions', 'Security clearance levels only', 'Department codes only'], answer: 1},
+      {q: 'The Chinese Wall model is designed to prevent:', options: ['Network attacks', 'Conflicts of interest', 'Data corruption', 'System failures'], answer: 1},
+      {q: 'Which IAM component acts as a centralized repository for identities and attributes?', options: ['Authentication services', 'Directory services', 'Authorization services', 'Reporting services'], answer: 1},
+      {q: 'Active Directory Domain Services (AD DS) provides:', options: ['Single Sign-On across organizations', 'Core directory services for Windows domains', 'Digital certificate management', 'Document rights management'], answer: 1},
+      {q: 'AD FS (Active Directory Federation Services) enables:', options: ['Local user management', 'Single Sign-On across different systems', 'File sharing', 'Network segmentation'], answer: 1},
+      {q: 'A concrete wall would be classified as what type of physical access control?', options: ['Soft method', 'Hard method', 'Entry control', 'Operational control'], answer: 1},
+      {q: 'Strategic landscaping is an example of:', options: ['Hard method', 'Soft method', 'Entry control', 'Operational control'], answer: 1},
+      {q: 'Biometric scanners are classified as:', options: ['Hard methods', 'Soft methods', 'Entry controls', 'Operational controls'], answer: 2},
+      {q: 'Security policies and procedures are considered:', options: ['Hard methods', 'Soft methods', 'Entry controls', 'Operational controls'], answer: 3},
+      {q: 'The main challenge with traditional locks and keys in large organizations is:', options: ['They require electricity', 'Key management and duplication risks', 'They are too secure', 'Employees don\'t like them'], answer: 1},
+      {q: 'Card access systems can use all these technologies EXCEPT:', options: ['Magnetic stripe', 'RFID', 'Smart chips', 'Retina scanning'], answer: 3},
+      {q: '"Risk Dumping" through cybersecurity insurance can lead to:', options: ['Better security investment', 'Moral hazard and underinvestment in security', 'Increased employee training', 'Stronger compliance'], answer: 1},
+      {q: 'Early Windows versions were insecure mainly because they prioritized:', options: ['Cost reduction', 'Ease of use and compatibility over security', 'Open source components', 'Government requirements'], answer: 1},
+      {q: 'In game theory, the "Prisoner\'s Dilemma" demonstrates that:', options: ['Cooperation always leads to the best outcome', 'Individual rational choices can lead to worse collective outcomes', 'Games are only for entertainment', 'Police always win'], answer: 1},
+      {q: 'In a Vickrey auction, the winner pays:', options: ['Their own bid amount', 'The lowest bid amount', 'The second-highest bid amount', 'The average of all bids'], answer: 2},
+      {q: 'Polyinstantiation in MLS databases addresses the problem of:', options: ['Slow query performance', 'Information leakage through file names', 'User authentication', 'Data encryption'], answer: 1},
+      {q: 'The "Aggregation Problem" refers to:', options: ['Combining multiple security systems', 'Individual unclassified data revealing secrets when combined', 'Adding up security costs', 'Grouping users by department'], answer: 1},
+      {q: 'Multilateral security is particularly challenging because:', options: ['It only works in military environments', 'It requires separating people with the same clearance level', 'It eliminates all need for authentication', 'It\'s cheaper to implement than MLS'], answer: 1},
+      {q: 'The Clark-Wilson model is designed primarily for what type of environments?', options: ['Military classified systems', 'Commercial and business systems', 'Academic research', 'Personal home use'], answer: 1},
+      {q: 'In Clark-Wilson, data that can be accessed directly by users is called:', options: ['Constrained Data Items (CDIs)', 'Unconstrained Data Items (UDIs)', 'Transformation Procedures (TPs)', 'Integrity Verification Procedures (IVPs)'], answer: 1},
+      {q: 'Separation of Duties in Clark-Wilson helps prevent:', options: ['Data confidentiality breaches', 'Fraud and errors', 'System crashes', 'Network congestion'], answer: 1},
+      {q: 'What is the primary focus of the Clark-Wilson model?', options: ['Confidentiality', 'Integrity', 'Availability', 'Authentication'], answer: 1},
+      {q: 'In the context of risk management, what does the term "risk appetite" refer to?', options: ['The type of risks an organization faces', 'The amount and type of risk an organization is willing to accept', 'The process of avoiding all risks', 'The insurance coverage for risks'], answer: 1},
+      {q: 'The concept of "separation of duties" is most closely associated with which security model?', options: ['Bell-LaPadula', 'Biba', 'Clark-Wilson', 'Chinese Wall'], answer: 2}
+    ];
+
+    // Initialize variables
+    let currentQuestion = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+    let score = 0;
+
+    // DOM elements
+    const questionNav = document.getElementById('question-nav');
+    const currentQElement = document.getElementById('current-q');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const resultSection = document.getElementById('result-section');
+    const scoreElement = document.getElementById('score');
+    const scoreText = document.getElementById('score-text');
+    const restartBtn = document.getElementById('restart-btn');
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    const questionSection = document.getElementById('question-section');
+    const submitSection = document.querySelector('.submit-section');
+
+    // Initialize question navigation
+    function initQuestionNav() {
+      questionNav.innerHTML = '';
+      for (let i = 0; i < quizData.length; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'question-nav-btn';
+        if (i === currentQuestion) {
+          btn.classList.add('active');
+        }
+        if (userAnswers[i] !== null) {
+          btn.classList.add('answered');
+        }
+        btn.textContent = i + 1;
+        btn.addEventListener('click', () => {
+          currentQuestion = i;
+          showQuestion();
+          updateNavigation();
+        });
+        questionNav.appendChild(btn);
+      }
+    }
+
+    // Show current question
+    function showQuestion() {
+      const question = quizData[currentQuestion];
+      currentQElement.textContent = currentQuestion + 1;
+      questionText.textContent = question.q;
+      
+      optionsContainer.innerHTML = '';
+      question.options.forEach((option, index) => {
+        const optionElement = document.createElement('div');
+        optionElement.className = 'option';
+        if (userAnswers[currentQuestion] === index) {
+          optionElement.classList.add('selected');
+        }
+        
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'option';
+        input.value = index;
+        input.checked = userAnswers[currentQuestion] === index;
+        
+        const label = document.createElement('label');
+        label.textContent = option;
+        
+        optionElement.appendChild(input);
+        optionElement.appendChild(label);
+        
+        optionElement.addEventListener('click', () => {
+          userAnswers[currentQuestion] = index;
+          showQuestion();
+          updateNavigation();
+        });
+        
+        optionsContainer.appendChild(optionElement);
+      });
+      
+      updateNavigation();
+    }
+
+    // Update navigation buttons and question nav
+    function updateNavigation() {
+      // Update prev/next buttons
+      prevBtn.disabled = currentQuestion === 0;
+      nextBtn.disabled = currentQuestion === quizData.length - 1;
+      
+      // Update question nav buttons
+      const navButtons = document.querySelectorAll('.question-nav-btn');
+      navButtons.forEach((btn, index) => {
+        btn.classList.remove('active');
+        if (index === currentQuestion) {
+          btn.classList.add('active');
+        }
+        
+        if (userAnswers[index] !== null) {
+          btn.classList.add('answered');
+        } else {
+          btn.classList.remove('answered');
+        }
+      });
+    }
+
+    // Calculate and show results
+    function showResults() {
+      score = 0;
+      for (let i = 0; i < quizData.length; i++) {
+        if (userAnswers[i] === quizData[i].answer) {
+          score++;
+        }
+      }
+      
+      scoreElement.textContent = `${score}/${quizData.length}`;
+      
+      const percentage = (score / quizData.length) * 100;
+      if (percentage >= 90) {
+        scoreText.textContent = 'Excellent! You have a strong understanding of Security Engineering Principles.';
+      } else if (percentage >= 80) {
+        scoreText.textContent = 'Great job! You have a good grasp of the material.';
+      } else if (percentage >= 70) {
+        scoreText.textContent = 'Good effort! Review the questions you missed to improve.';
+      } else if (percentage >= 60) {
+        scoreText.textContent = 'You passed, but there\'s room for improvement. Review the material.';
+      } else {
+        scoreText.textContent = 'Keep studying! Review the course material and try again.';
+      }
+      
+      questionSection.style.display = 'none';
+      submitSection.style.display = 'none';
+      resultSection.style.display = 'block';
+    }
+
+    // Restart quiz
+    function restartQuiz() {
+      currentQuestion = 0;
+      userAnswers = new Array(quizData.length).fill(null);
+      score = 0;
+      
+      questionSection.style.display = 'block';
+      submitSection.style.display = 'block';
+      resultSection.style.display = 'none';
+      
+      showQuestion();
+      initQuestionNav();
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        showQuestion();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        showQuestion();
+      }
+    });
+
+    submitBtn.addEventListener('click', showResults);
+    
+    restartBtn.addEventListener('click', restartQuiz);
+    
+    // Category tabs
+    categoryTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        categoryTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        const category = tab.getAttribute('data-category');
+        if (category === 'all') {
+          // Show all questions
+          currentQuestion = 0;
+        } else if (category === '1') {
+          currentQuestion = 0; // Questions 1-30
+        } else if (category === '2') {
+          currentQuestion = 30; // Questions 31-60
+        } else if (category === '3') {
+          currentQuestion = 60; // Questions 61-90
+        } else if (category === '4') {
+          currentQuestion = 90; // Questions 91-150
+        }
+        
+        showQuestion();
+      });
+    });
+
+    // Initialize the quiz
+    showQuestion();
+    initQuestionNav();
+  </script>
+</body>
+</html>
